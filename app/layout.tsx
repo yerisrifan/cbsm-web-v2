@@ -3,7 +3,6 @@ import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import Hero from "@/components/Hero";
-import { AppProgressBar as ProgressBar } from "next-nprogress-bar";
 
 export const metadata: Metadata = {
   title:
