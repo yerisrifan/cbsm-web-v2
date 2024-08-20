@@ -67,7 +67,7 @@ export default function Home() {
         </div>
         <div className="flex flex-col items-center justify-center gap-4 ">
           <Image
-            src="/assets/image/section-2-img-4.jpg"
+            src="/assets/image/section-2-img-4.webp"
             alt="hero"
             width={0}
             height={0}

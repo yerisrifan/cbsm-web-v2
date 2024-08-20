@@ -7,7 +7,7 @@ import { RiMenu3Line } from "react-icons/ri";
 function Navbar() {
   const [open, setOpen] = React.useState(false);
   return (
-    <div className="flex  justify-between items-center bg-primary text-white px-4 md:px-10 pt-2 md:pt-10 pb-2 md:pb-0 shadow-sm">
+    <div className="flex  justify-between items-center bg-primary text-white px-4 md:px-10 pt-4 md:pt-10 pb-4 md:pb-0 shadow-sm">
       <div id="dekstop" className="hidden md:flex font-arialb mb-0 md:mb-4">
         <Image
           src="/assets/image/logo.webp"
