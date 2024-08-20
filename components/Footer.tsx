@@ -5,7 +5,7 @@ function Footer() {
   return (
     <div className="bg-primary text-white p-8 flex flex-col items-center justify-center w-full">
       <Image
-        src="/assets/image/logo-small-big.png"
+        src="/assets/image/logo-small-big.webp"
         alt="logo"
         width={100}
         height={50}

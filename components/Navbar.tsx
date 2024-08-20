@@ -7,10 +7,10 @@ import { RiMenu3Line } from "react-icons/ri";
 function Navbar() {
   const [open, setOpen] = React.useState(false);
   return (
-    <div className="flex  justify-between items-center bg-primary text-white px-4 md:px-10 pt-0 md:pt-10 pb-0 md:pb-0 shadow-sm">
+    <div className="flex  justify-between items-center bg-primary text-white px-4 md:px-10 pt-2 md:pt-10 pb-2 md:pb-0 shadow-sm">
       <div id="dekstop" className="hidden md:flex font-arialb mb-0 md:mb-4">
         <Image
-          src="/assets/image/logo.png"
+          src="/assets/image/logo.webp"
           alt="logo"
           width={250}
           height={100}
@@ -19,7 +19,7 @@ function Navbar() {
       </div>
       <div id="mobile" className="flex md:hidden font-arialb">
         <Image
-          src="/assets/image/logo.png"
+          src="/assets/image/logo.webp"
           alt="logo"
           width={150}
           height={30}

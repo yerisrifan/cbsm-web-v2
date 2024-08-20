@@ -5,7 +5,7 @@ function Hero() {
   return (
     <div className="relative">
       <Image
-        src="/assets/image/hero-image.jpg"
+        src="/assets/image/hero-image.webp"
         alt="hero"
         width={0}
         height={0}

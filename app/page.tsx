@@ -22,7 +22,7 @@ export default function Home() {
         </div>
         <div className="w-full md:w-1/2">
           <Image
-            src="/assets/image/section-1.jpg"
+            src="/assets/image/section-1.webp"
             alt="hero"
             width={0}
             height={0}
@@ -34,7 +34,7 @@ export default function Home() {
       <section className="grid grid-cols-1 md:grid-cols-4 p-8 bg-foreground  gap-8 md:gap-4">
         <div className="flex flex-col items-center justify-center gap-4 ">
           <Image
-            src="/assets/image/section-2-img-1.jpg"
+            src="/assets/image/section-2-img-1.webp"
             alt="hero"
             width={0}
             height={0}
@@ -45,7 +45,7 @@ export default function Home() {
         </div>
         <div className="flex flex-col items-center justify-center gap-4 ">
           <Image
-            src="/assets/image/section-2-img-2.jpg"
+            src="/assets/image/section-2-img-2.webp"
             alt="hero"
             width={0}
             height={0}
@@ -56,7 +56,7 @@ export default function Home() {
         </div>
         <div className="flex flex-col items-center justify-center gap-4 ">
           <Image
-            src="/assets/image/section-2-img-3.jpg"
+            src="/assets/image/section-2-img-3.webp"
             alt="hero"
             width={0}
             height={0}
@@ -89,7 +89,7 @@ export default function Home() {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 p-8">
           <Image
-            src="/assets/image/img-app.png"
+            src="/assets/image/img-app.webp"
             alt="hero"
             width={0}
             height={0}
