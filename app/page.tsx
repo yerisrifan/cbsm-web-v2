@@ -1,113 +1,179 @@
 import Image from "next/image";
+import { IoLogoAndroid } from "react-icons/io";
+import { FaApple } from "react-icons/fa";
 
 export default function Home() {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing&nbsp;
-          <code className="font-mono font-bold">app/page.tsx</code>
-        </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:size-auto lg:bg-none">
-          <a
-            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{" "}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className="dark:invert"
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
+    <main className="space-y-20 my-8 px-0 md:px-8 mt-20">
+      <section className="flex flex-col md:flex-row justify-between px-8 ">
+        <div className="w-full md:w-1/2 mb-4">
+          <div className="flex items-center">
+            <div className="ring-offset-2 ring-4 mr-1 ring-yellow rounded-full w-2 h-2"></div>
+            <div className="w-full border-b-4 border-yellow"></div>
+          </div>
+          <h3 className="text-5xl font-arialb mt-8 ">
+            Berinteraksi dan berbagi pengalaman!
+          </h3>
+          <p className="text-2xl font-medium mt-12 pr-10">
+            Dapatkan akses ke informasi dan pengetahuan teruji dan terpecaya
+            dalam budidaya berbagai macam burung kenari dari komunitas manajemen
+            ternak kenari.
+          </p>
         </div>
-      </div>
-
-      <div className="relative z-[-1] flex place-items-center before:absolute before:h-[300px] before:w-full before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-full after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700 before:dark:opacity-10 after:dark:from-sky-900 after:dark:via-[#0141ff] after:dark:opacity-40 sm:before:w-[480px] sm:after:w-[240px] before:lg:h-[360px]">
-        <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
-
-      <div className="mb-32 grid text-center lg:mb-0 lg:w-full lg:max-w-5xl lg:grid-cols-4 lg:text-left">
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
+        <div className="w-full md:w-1/2">
+          <Image
+            src="/assets/image/section-1.jpg"
+            alt="hero"
+            width={0}
+            height={0}
+            sizes="100vw"
+            className="object-cover w-full h-[350px] relative mt-10 md:mt-0"
+          />
+        </div>
+      </section>
+      <section className="grid grid-cols-1 md:grid-cols-4 p-8 bg-foreground  gap-8 md:gap-4">
+        <div className="flex flex-col items-center justify-center gap-4 ">
+          <Image
+            src="/assets/image/section-2-img-1.jpg"
+            alt="hero"
+            width={0}
+            height={0}
+            sizes="100vw"
+            className="object-cover w-[420px] h-[240px] relative"
+          />
+          <h4 className="font-arialb text-2xl">Kebersihan</h4>
+        </div>
+        <div className="flex flex-col items-center justify-center gap-4 ">
+          <Image
+            src="/assets/image/section-2-img-2.jpg"
+            alt="hero"
+            width={0}
+            height={0}
+            sizes="50vw"
+            className="object-cover w-[420px] h-[240px] relative"
+          />
+          <h4 className="font-arialb text-2xl">Jenis Kandang ternak</h4>
+        </div>
+        <div className="flex flex-col items-center justify-center gap-4 ">
+          <Image
+            src="/assets/image/section-2-img-3.jpg"
+            alt="hero"
+            width={0}
+            height={0}
+            sizes="10vw"
+            className="object-cover w-[420px] h-[240px] relative"
+          />
+          <h4 className="font-arialb text-2xl">Pengaturan Ruangan</h4>
+        </div>
+        <div className="flex flex-col items-center justify-center gap-4 ">
+          <Image
+            src="/assets/image/section-2-img-4.jpg"
+            alt="hero"
+            width={0}
+            height={0}
+            sizes="100vw"
+            className="object-cover w-[420px] h-[240px] relative"
+          />
+          <h4 className="font-arialb text-2xl">Pengaturan Indukan</h4>
+        </div>
+      </section>
+      <section id="app" className="relative">
+        <div id="top" className="flex flex-col md:flex-row absolute w-full ">
+          <div className="relative w-[500px] h-[500px]"></div>
+          <div className="w-full hidden md:block">
+            <div className="flex items-center mt-20">
+              <div className="w-full border-b-4 border-yellow"></div>
+              <div className="ring-offset-2 ring-4 mr-1 ring-yellow rounded-full w-2 h-2"></div>
+            </div>
+          </div>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 p-8">
+          <Image
+            src="/assets/image/img-app.png"
+            alt="hero"
+            width={0}
+            height={0}
+            sizes="100vw"
+            className="object-cover w-full h-[700px] relative"
+          />
+          <div className="mt-32 z-10">
+            <h4 className="font-arialb text-4xl">
+              Berhasil dalam budidaya burung kenari!
+            </h4>
+            <p className="text-2xl font-medium mt-4">
+              Aplikasi CBSM diciptakan untuk berbagi pengetahuan dan mengenalkan
+              sebuah sistem untuk mengelola budidaya burung kenari.
+            </p>
+            <h5 className="text-4xl font-arialb mt-8">Coba sekarang!</h5>
+            <div className="flex flex-col md:flex-row mt-4 space-x-0 md:space-x-4 space-y-2 md:space-y-0">
+              <a
+                href="https://app.cbsm.co.id/uploads/cbsm-1.2.3.apk"
+                target="_blank"
+                className="bg-primary px-16 py-2 text-yellow font-arialb flex items-center justify-center cursor-pointer "
+              >
+                <IoLogoAndroid size={24} className="mr-2" />
+                Android
+              </a>
+              <a
+                href="https://apps.apple.com/id/app/cbsm/id6593665827?l=id"
+                target="_blank"
+                className="bg-primary px-16 py-2 text-yellow font-arialb flex items-center justify-center "
+              >
+                <FaApple size={24} className="mr-2" />
+                IOS
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section id="about" className="bg-yellow p-8">
+        <div
+          id="footer-header"
+          className="flex flex-col md:flex-row items-center justify-center "
         >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Docs{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Learn{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Templates{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Explore starter templates for Next.js.
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Deploy{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-balance text-sm opacity-50">
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
+          <h4 className="font-arialb text-4xl min-w-fit">Tentang Kami</h4>
+          <div className="w-full hidden md:block">
+            <div className="flex items-center ml-4">
+              <div className="w-full border-b-4 border-primary"></div>
+              <div className="ring-offset-2 ring-offset-primary ring-2 mr-1 ring-primary rounded-full w-3 h-3"></div>
+            </div>
+          </div>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 font-medium mt-4">
+          <div className="space-y-4">
+            <p>
+              CBSM (Canary Breeding System Management) adalah solusi utama Anda
+              untuk mengelola dan mengoptimalkan pengembangbiakan burung kenari.
+              Platform kami dirancang khusus untuk para pembiak yang berfokus
+              pada pengembangan burung kenari Yorkshire yang diimpor.
+            </p>
+            <p>
+              Platform kami memiliki fitur kemampuan perekaman data terperinci,
+              yang memungkinkan Anda untuk menyimpan catatan yang akurat untuk
+              setiap burung kenari, termasuk pasangan pengembangbiakan dan data
+              inkubasi. Selain itu, CBSM menyediakan statistik dan wawasan yang
+              kuat untuk membantu Anda memantau populasi burung kenari Anda dari
+              waktu ke waktu. Anda dapat memfilter data
+            </p>
+          </div>
+          <div className="space-y-4">
+            <p>
+              berdasarkan tahun, jenis kelamin, dan status telur untuk
+              mendapatkan wawasan berharga tentang aktivitas pengembangbiakan
+              Anda.
+            </p>
+            <p>
+              Dengan CBSM, Anda juga mendapatkan manfaat dari pemfilteran
+              berbasis pemilik, yang memungkinkan Anda untuk hanya melihat
+              burung kenari yang Anda miliki, sehingga menyederhanakan
+              pengelolaan koleksi Anda. Antarmuka yang ramah pengguna memastikan
+              bahwa navigasi dan pengelolaan catatan Anda intuitif dan efisien.
+              Bergabunglah dengan komunitas CBSM hari ini dan tingkatkan
+              pengalaman manajemen pengembangbiakan burung kenari Anda!
+            </p>
+          </div>
+        </div>
+      </section>
     </main>
   );
 }
