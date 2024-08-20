@@ -94,7 +94,7 @@ export default function Home() {
             width={0}
             height={0}
             sizes="100vw"
-            className="object-cover w-full h-[700px] relative"
+            className="object-contain w-full h-[700px] relative"
           />
           <div className="mt-32 z-10">
             <h4 className="font-arialb text-4xl">
