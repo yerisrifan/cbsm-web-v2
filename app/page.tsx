@@ -109,6 +109,7 @@ export default function Home() {
           className="w-full aspect-video self-stretch md:min-h-96"
           src="https://www.youtube.com/embed/XhFT7SmUYJw?si=tNB8y_KSMhftiYZd"
           frameBorder="0"
+          loading="lazy"
           title="Product Overview Video"
           aria-hidden="true"
         />
