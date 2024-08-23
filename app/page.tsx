@@ -59,15 +59,6 @@ export default function Home() {
       </section>
 
       <section id="app" className="relative px-4 md:px-8">
-        <div id="top" className="flex flex-col md:flex-row w-full">
-          <div className="relative w-full md:w-[500px] h-[300px] md:h-[500px]"></div>
-          <div className="w-full hidden md:block">
-            <div className="flex items-center mt-20">
-              <div className="w-full border-b-4 border-yellow"></div>
-              <div className="ring-offset-2 ring-4 mr-1 ring-yellow rounded-full w-2 h-2"></div>
-            </div>
-          </div>
-        </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <Image
             src="/assets/image/img-app.webp"
@@ -75,7 +66,7 @@ export default function Home() {
             width={0}
             height={0}
             sizes="100vw"
-            className="object-cover w-full h-[400px] md:h-[700px] relative"
+            className="object-contain w-full h-[400px] md:h-[700px] relative"
           />
           <div className="mt-8 md:mt-32 z-10">
             <h4 className="font-arialb text-3xl md:text-4xl">
@@ -108,6 +99,19 @@ export default function Home() {
             </div>
           </div>
         </div>
+      </section>
+
+      <section id="tutorial">
+        <h4 className="font-arialb text-3xl md:text-4xl text-center mb-10">
+          Video Tutorial
+        </h4>
+        <iframe
+          className="w-full aspect-video self-stretch md:min-h-96"
+          src="https://www.youtube.com/embed/XhFT7SmUYJw?si=tNB8y_KSMhftiYZd"
+          frameBorder="0"
+          title="Product Overview Video"
+          aria-hidden="true"
+        />
       </section>
 
       <section id="about" className="bg-yellow p-4 md:p-8">
