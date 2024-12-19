@@ -81,7 +81,7 @@ export default function Home() {
             </h5>
             <div className="flex flex-col sm:flex-row mt-4 space-y-2 sm:space-y-0 sm:space-x-4">
               <a
-                href="https://app.cbsm.co.id/uploads/cbsm-1.2.3.apk"
+                href="https://play.google.com/store/apps/details?id=com.cbsm.breeder"
                 target="_blank"
                 className="bg-primary px-8 md:px-16 py-2 text-yellow font-arialb flex items-center justify-center cursor-pointer"
               >
@@ -107,7 +107,7 @@ export default function Home() {
         </h4>
         <iframe
           className="w-full aspect-video self-stretch md:min-h-96"
-          src="https://www.youtube.com/embed/XhFT7SmUYJw?si=tNB8y_KSMhftiYZd"
+          src="https://www.youtube.com/embed/29zUh58dSCk?si=o2HhiRaHfracEKLT"
           frameBorder="0"
           loading="lazy"
           title="Product Overview Video"
