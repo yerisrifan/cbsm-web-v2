@@ -5,10 +5,9 @@ import Footer from "@/components/Footer";
 import Hero from "@/components/Hero";
 
 export const metadata: Metadata = {
-  title:
-    "CBSM - Aplikasi Manajemen Breeding Kenari Yorkshire | Pengelolaan Ternak Kenari Terbaik",
+  title: "CBSM - Aplikasi Manajemen Breeding Kenari Yorkshire Terbaik",
   description:
-    "CBSM (Canary Breeding System Management) adalah aplikasi manajemen breeding kenari yang dirancang untuk membantu peternak dalam mengelola dan mencatat data breeding kenari Yorkshire dengan mudah dan efisien. Fitur utama CBSM meliputi pencatatan data kenari, manajemen pasangan, inkubasi telur, dan pengelolaan penjualan burung. Dapatkan analisis statistik mendalam berdasarkan tahun dan jenis kelamin, serta filter data berdasarkan pemilik. Dengan CBSM, optimalkan proses breeding kenari Anda dan tingkatkan keberhasilan ternak Anda. CBSM adalah solusi terbaik bagi peternak kenari yang ingin sukses dalam bisnis breeding.",
+    "CBSM (Canary Breeding System Management) adalah aplikasi manajemen breeding burung kenari Yorkshire. Catat dan kelola data ternak dengan mudah.",
 };
 
 export default function RootLayout({
@@ -19,6 +18,23 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="antialiased font-arial">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "SoftwareApplication",
+              "name": "CBSM Canary Breeding",
+              "operatingSystem": "Android, iOS",
+              "applicationCategory": "BusinessApplication, Utilities",
+              "offers": {
+                "@type": "Offer",
+                "price": "0",
+                "priceCurrency": "IDR",
+              },
+            }),
+          }}
+        />
         <Navbar />
         <Hero />
         {children}
