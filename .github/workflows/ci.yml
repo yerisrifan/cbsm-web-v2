@@ -1,4 +1,4 @@
-name: Next.js CI/CD Build
+name: Next.js CI/CD Build & Deploy
 
 on:
   push:
@@ -40,3 +40,25 @@ jobs:
 
       - name: Run Next.js Build
         run: npm run build
+
+  deploy:
+    name: Deploy to VPS
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+
+    steps:
+      - name: Execute remote commands via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 22
+          script: |
+            cd /home/yerisrifan/cbsm-web-v2
+            git pull origin master
+            npm install
+            npm run build
+            pm2 restart cbsm-web-v2 || pm2 start npm --name "cbsm-web-v2" -- start
+
