@@ -3,6 +3,7 @@
 import React from "react";
 import Image from "next/image";
 import { RiMenu3Line } from "react-icons/ri";
+import Link from "next/link";
 
 function Navbar() {
   const [open, setOpen] = React.useState(false);
@@ -27,12 +28,12 @@ function Navbar() {
         />
       </div>
       <div className="space-x-4 hidden md:flex font-arialb">
-        <a
+        <Link
           href="/"
           className="bg-yellow px-4 py-2 text-primary  hover:bg-yellow/80 transition delay-150 hover:text-white"
         >
           Beranda
-        </a>
+        </Link>
 
         <a
           href="#app"
@@ -75,7 +76,7 @@ function Navbar() {
       >
         <div>
           <div className="bg-primary  text-white px-4 py-2  hover:bg-yellow/80 transition delay-150">
-            <a href="/">Beranda</a>
+            <Link href="/">Beranda</Link>
           </div>
           <div className="bg-primary text-white px-4 py-2  hover:bg-yellow/80 transition delay-150">
             <a href="#app">Aplikasi CBSM</a>
