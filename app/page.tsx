@@ -141,18 +141,19 @@ export default function Home() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 font-medium mt-4">
             <div className="space-y-4">
               <p className="text-sm md:text-base">
-                CBSM (Canary Breeding System Management) adalah solusi utama Anda
-                untuk mengelola dan mengoptimalkan pengembangbiakan burung kenari.
-                Platform kami dirancang khusus untuk para pembiak yang berfokus
-                pada pengembangan burung kenari Yorkshire yang diimpor.
+                CBSM (Canary Breeding System Management) adalah solusi utama
+                Anda untuk mengelola dan mengoptimalkan pengembangbiakan burung
+                kenari. Platform kami dirancang khusus untuk para pembiak yang
+                berfokus pada pengembangan burung kenari Yorkshire yang diimpor.
               </p>
               <p className="text-sm md:text-base">
-                Platform kami memiliki fitur kemampuan perekaman data terperinci,
-                yang memungkinkan Anda untuk menyimpan catatan yang akurat untuk
-                setiap burung kenari, termasuk pasangan pengembangbiakan dan data
-                inkubasi. Selain itu, CBSM menyediakan statistik dan wawasan yang
-                kuat untuk membantu Anda memantau populasi burung kenari Anda dari
-                waktu ke waktu. Anda dapat memfilter data
+                Platform kami memiliki fitur kemampuan perekaman data
+                terperinci, yang memungkinkan Anda untuk menyimpan catatan yang
+                akurat untuk setiap burung kenari, termasuk pasangan
+                pengembangbiakan dan data inkubasi. Selain itu, CBSM menyediakan
+                statistik dan wawasan yang kuat untuk membantu Anda memantau
+                populasi burung kenari Anda dari waktu ke waktu. Anda dapat
+                memfilter data
               </p>
             </div>
             <div className="space-y-4">
@@ -165,10 +166,11 @@ export default function Home() {
                 Dengan CBSM, Anda juga mendapatkan manfaat dari pemfilteran
                 berbasis pemilik, yang memungkinkan Anda untuk hanya melihat
                 burung kenari yang Anda miliki, sehingga menyederhanakan
-                pengelolaan koleksi Anda. Antarmuka yang ramah pengguna memastikan
-                bahwa navigasi dan pengelolaan catatan Anda intuitif dan efisien.
-                Bergabunglah dengan komunitas CBSM hari ini dan tingkatkan
-                pengalaman manajemen pengembangbiakan burung kenari Anda!
+                pengelolaan koleksi Anda. Antarmuka yang ramah pengguna
+                memastikan bahwa navigasi dan pengelolaan catatan Anda intuitif
+                dan efisien. Bergabunglah dengan komunitas CBSM hari ini dan
+                tingkatkan pengalaman manajemen pengembangbiakan burung kenari
+                Anda!
               </p>
             </div>
           </div>
