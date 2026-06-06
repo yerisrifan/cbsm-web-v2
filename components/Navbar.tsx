@@ -35,6 +35,13 @@ function Navbar() {
           Beranda
         </Link>
 
+        <Link
+          href="/avigen"
+          className="bg-yellow px-4 py-2 text-primary  hover:bg-yellow/80 transition delay-150 hover:text-white"
+        >
+          Kalkulator Avigen
+        </Link>
+
         <a
           href="#app"
           className="bg-yellow px-4 py-2 text-primary  hover:bg-yellow/80 transition delay-150 hover:text-white"
@@ -77,6 +84,9 @@ function Navbar() {
         <div>
           <div className="bg-primary  text-white px-4 py-2  hover:bg-yellow/80 transition delay-150">
             <Link href="/">Beranda</Link>
+          </div>
+          <div className="bg-primary text-white px-4 py-2  hover:bg-yellow/80 transition delay-150">
+            <Link href="/avigen">Kalkulator Avigen</Link>
           </div>
           <div className="bg-primary text-white px-4 py-2  hover:bg-yellow/80 transition delay-150">
             <a href="#app">Aplikasi CBSM</a>
