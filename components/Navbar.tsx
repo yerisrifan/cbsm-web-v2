@@ -45,24 +45,24 @@ function Navbar() {
             Kalkulator Avigen
           </Link>
 
-          <a
-            href="#app"
+          <Link
+            href="/#app"
             className="bg-yellow px-4 py-2 text-primary  hover:bg-yellow/80 transition delay-150 hover:text-white"
           >
             Aplikasi CBSM
-          </a>
-          <a
-            href="#tutorial"
+          </Link>
+          <Link
+            href="/#tutorial"
             className="bg-yellow px-4 py-2 text-primary  hover:bg-yellow/80 transition delay-150 hover:text-white"
           >
             Tutorial
-          </a>
-          <a
-            href="#about"
+          </Link>
+          <Link
+            href="/#about"
             className="bg-yellow px-4 py-2 text-primary  hover:bg-yellow/80 transition delay-150 hover:text-white"
           >
             Tentang CBSM
-          </a>
+          </Link>
           <a
             target="_blank"
             href="https://lynk.id/pendaftarancbsm"
@@ -92,13 +92,13 @@ function Navbar() {
               <Link href="/avigen">Kalkulator Avigen</Link>
             </div>
             <div className="bg-primary text-white px-4 py-2  hover:bg-yellow/80 transition delay-150">
-              <a href="#app">Aplikasi CBSM</a>
+              <Link href="/#app">Aplikasi CBSM</Link>
             </div>
             <div className="bg-primary text-white px-4 py-2  hover:bg-yellow/80 transition delay-150">
-              <a href="#tutorial">Tutorial</a>
+              <Link href="/#tutorial">Tutorial</Link>
             </div>
             <div className="bg-primary text-white px-4 py-2  hover:bg-yellow/80 transition delay-150">
-              <a href="#about">Tentang CBSM</a>
+              <Link href="/#about">Tentang CBSM</Link>
             </div>
             <div className="bg-primary text-white px-4 py-2  hover:bg-yellow/80 transition delay-150">
               <a target="_blank" href="https://lynk.id/pendaftarancbsm">
