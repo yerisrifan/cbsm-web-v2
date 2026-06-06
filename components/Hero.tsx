@@ -10,6 +10,7 @@ function Hero() {
         width={0}
         height={0}
         sizes="100vw"
+        priority
         className="object-cover w-full h-[480px] relative"
       />
       <div className="absolute inset-0 bg-black/50 w-full h-full text-white">

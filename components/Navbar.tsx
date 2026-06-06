@@ -15,6 +15,7 @@ function Navbar() {
           alt="logo"
           width={250}
           height={100}
+          style={{ height: "auto" }}
           className="cursor-pointer"
         />
       </div>
@@ -24,6 +25,7 @@ function Navbar() {
           alt="logo"
           width={150}
           height={30}
+          style={{ height: "auto" }}
           className="cursor-pointer"
         />
       </div>

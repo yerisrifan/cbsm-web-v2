@@ -9,6 +9,7 @@ function Footer() {
         alt="logo"
         width={100}
         height={50}
+        style={{ height: "auto" }}
       />
       <div className="text-center text-sm text-white/70 max-w-xl">
         Seluruh hak cipta foto dan grafis yang ditampilkan dalam laman ini
