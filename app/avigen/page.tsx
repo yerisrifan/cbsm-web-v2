@@ -1,73 +1,51 @@
 // @ts-nocheck
 "use client";
 
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   Settings2,
-  Bird,
   Dna,
   GitBranch,
   AlertTriangle,
   ChevronDown,
   Activity,
   EggOff,
+  Info,
 } from "lucide-react";
 
-interface ColorSwatchProps {
-  color1: string;
-  color2: string;
-  isLethal?: boolean;
-}
-
-const ColorSwatch: React.FC<ColorSwatchProps> = ({ color1, color2, isLethal }) => (
-  <div className="relative">
-    <div
-      className={`w-10 h-10 md:w-12 md:h-12 rounded-full border-2 border-slate-200 shadow-sm ${isLethal ? "opacity-30" : ""}`}
-      style={{
-        background: `linear-gradient(135deg, ${color1} 40%, ${color2} 60%)`,
-      }}
-    ></div>
-    {isLethal && (
-      <EggOff size={20} className="absolute inset-0 m-auto text-slate-500" />
-    )}
-  </div>
-);
-
-const MiniColorSwatch: React.FC<ColorSwatchProps> = ({ color1, color2, isLethal }) => (
-  <div className="relative flex-shrink-0">
-    <div
-      className={`w-8 h-8 rounded-full border border-slate-300 shadow-sm ${isLethal ? "opacity-30" : ""}`}
-      style={{
-        background: `linear-gradient(135deg, ${color1} 40%, ${color2} 60%)`,
-      }}
-    ></div>
-    {isLethal && (
-      <EggOff size={14} className="absolute inset-0 m-auto text-slate-500" />
-    )}
-  </div>
-);
-
 export default function App() {
-  // Modes: 'mendel1_base', 'sex_linked_cin', 'mendel2_dom', 'mendel2_res'
-  const [crossMode, setCrossMode] = useState("mendel2_dom");
+  const [crossMode, setCrossMode] = useState("mendel1_base");
 
   // Input State P1 (Sire) & P2 (Dam)
-  const [p1Input, setP1Input] = useState("HkWw");
-  const [p2Input, setP2Input] = useState("HKww");
+  const [p1Input, setP1Input] = useState("HH");
+  const [p2Input, setP2Input] = useState("kk");
 
-  // Calculated States
-  const [f1Data, setF1Data] = useState(null);
-  const [f2Data, setF2Data] = useState(null);
+  // List of simulated generations
+  const [crosses, setCrosses] = useState([]);
 
-  const [f2Parent1, setF2Parent1] = useState("");
-  const [f2Parent2, setF2Parent2] = useState("");
+  // Next Gen Form State
+  const [nextSireSource, setNextSireSource] = useState("C1");
+  const [nextSireGenotype, setNextSireGenotype] = useState("");
+  const [nextDamSource, setNextDamSource] = useState("C1");
+  const [nextDamGenotype, setNextDamGenotype] = useState("");
 
-  const f1Ref = useRef(null);
-  const f2Ref = useRef(null);
+  const latestCrossRef = useRef(null);
 
   // --- Opsi Dropdown Berdasarkan Mode ---
   const getDropdownOptions = (mode, isMale) => {
-    if (mode === "mendel1_base") {
+    if (mode === "ab_x_ab") {
+      return [
+        { val: "AABB", label: "AABB - Dominan A & B" },
+        { val: "AABb", label: "AABb - Dominan A, Carrier b" },
+        { val: "AAbb", label: "AAbb - Dominan A, Resesif b" },
+        { val: "AaBB", label: "AaBB - Carrier a, Dominan B" },
+        { val: "AaBb", label: "AaBb - Double Carrier" },
+        { val: "Aabb", label: "Aabb - Carrier a, Resesif b" },
+        { val: "aaBB", label: "aaBB - Resesif a, Dominan B" },
+        { val: "aaBb", label: "aaBb - Resesif a, Carrier b" },
+        { val: "aabb", label: "aabb - Double Resesif" },
+      ];
+    } else if (mode === "mendel1_base") {
       return [
         { val: "HH", label: "HH - Hijau Murni (Dominan)" },
         { val: "Hk", label: "Hk - Hijau Split Kuning (Carrier)" },
@@ -93,26 +71,20 @@ export default function App() {
         { val: "Hkww", label: "Hkww - Hijau Split Kuning" },
         { val: "HKww", label: "HKww - Bond (Bercak Hijau-Kuning)" },
         { val: "kkww", label: "kkww - Kuning Murni" },
-        {
-          val: "HHWw",
-          label: "HHWw - Starblue / Abu-abu (Bawaan Hijau Murni)",
-        },
-        {
-          val: "HkWw",
-          label: "HkWw - Starblue / Abu-abu (Bawaan Split Kuning)",
-        },
+        { val: "HHWw", label: "HHWw - Starblue (Bawaan Hijau Murni)" },
+        { val: "HkWw", label: "HkWw - Starblue (Bawaan Split Kuning)" },
         { val: "HKWw", label: "HKWw - Bond Putih (Bawaan Bond)" },
         { val: "kkWw", label: "kkWw - Putih Dominan (Bawaan Kuning)" },
       ];
     } else if (mode === "mendel2_res") {
       return [
-        { val: "HHPP", label: "HHPP - Hijau Murni (Non-Carrier)" },
+        { val: "HHPP", label: "HHPP - Hijau Murni" },
         { val: "HHPp", label: "HHPp - Hijau Carrier Putih Resesif" },
-        { val: "HHpp", label: "HHpp - Starblue / Abu-abu Resesif" },
+        { val: "HHpp", label: "HHpp - Starblue Resesif" },
         { val: "HKPP", label: "HKPP - Bond Biasa" },
         { val: "HKPp", label: "HKPp - Bond Carrier Putih Resesif" },
         { val: "HKpp", label: "HKpp - Bond Putih Resesif" },
-        { val: "kkPP", label: "kkPP - Kuning Murni (Non-Carrier)" },
+        { val: "kkPP", label: "kkPP - Kuning Murni" },
         { val: "kkPp", label: "kkPp - Kuning Carrier Putih Resesif" },
         { val: "kkpp", label: "kkpp - Putih Resesif Polos" },
       ];
@@ -121,9 +93,11 @@ export default function App() {
 
   const handleModeChange = (mode) => {
     setCrossMode(mode);
-    setF1Data(null);
-    setF2Data(null);
-    if (mode === "mendel1_base") {
+    setCrosses([]);
+    if (mode === "ab_x_ab") {
+      setP1Input("AABB");
+      setP2Input("aabb");
+    } else if (mode === "mendel1_base") {
       setP1Input("HH");
       setP2Input("kk");
     } else if (mode === "sex_linked_cin") {
@@ -138,7 +112,7 @@ export default function App() {
     }
   };
 
-  // --- Kamus Fenotipe dengan Penambahan Genetik Dasar ---
+  // --- Kamus Fenotipe ---
   const getPhenotype = (genotype) => {
     let result = {
       label: "Unknown",
@@ -149,6 +123,31 @@ export default function App() {
       genetics: "",
       isLethal: false,
     };
+
+    // Mode abxab
+    if (genotype.length === 4 && genotype.match(/^[AaBb]+$/)) {
+      let countA = (genotype.match(/A/g) || []).length;
+      let countB = (genotype.match(/B/g) || []).length;
+
+      let phenoA = countA > 0 ? "Dominan A" : "Resesif a";
+      let phenoB = countB > 0 ? "Dominan B" : "Resesif b";
+
+      let color1 = countA > 0 ? "#1d4ed8" : "#93c5fd";
+      let color2 = countB > 0 ? "#b91c1c" : "#fca5a5";
+
+      let label = `${phenoA} & ${phenoB}`;
+      let genetics = `Sifat: ${countA > 0 ? (countA === 2 ? "Homozigot A" : "Heterozigot A") : "Homozigot a"} & ${countB > 0 ? (countB === 2 ? "Homozigot B" : "Heterozigot B") : "Homozigot b"}`;
+
+      return {
+        label,
+        badge: `${phenoA[0]}-${phenoB[0]}`,
+        color1,
+        color2,
+        desc: genetics,
+        genetics,
+        isLethal: false,
+      };
+    }
 
     if (
       genotype.includes("Z+") ||
@@ -161,17 +160,15 @@ export default function App() {
           badge: "♂ Normal",
           color1: "#2f5233",
           color2: "#4a7c59",
-          desc: "Melanin penuh (Hijau/Kuning/Bond).",
-          genetics: "Bawaan Asli: Normal (Z⁺Z⁺)",
+          genetics: "Normal (Z⁺Z⁺)",
         };
       if (genotype === "Z+Zc" || genotype === "ZcZ+")
         result = {
-          label: "♂ Jantan Split Cinnamon",
+          label: "♂ Jantan Split Cin",
           badge: "♂ Split Cin",
           color1: "#4a7c59",
           color2: "#8b5a2b",
-          desc: "Visual normal, bawa gen Cinnamon.",
-          genetics: "Bawaan Asli: Carrier Cinnamon (Z⁺Zᶜ)",
+          genetics: "Carrier Cinnamon (Z⁺Zᶜ)",
         };
       if (genotype === "ZcZc")
         result = {
@@ -179,8 +176,7 @@ export default function App() {
           badge: "♂ Cinnamon",
           color1: "#8b5a2b",
           color2: "#6b4226",
-          desc: "Melanin coklat.",
-          genetics: "Bawaan Asli: Mutasi Cinnamon Penuh (ZᶜZᶜ)",
+          genetics: "Cinnamon Penuh (ZᶜZᶜ)",
         };
       if (genotype === "Z+W0" || genotype === "W0Z+")
         result = {
@@ -188,8 +184,7 @@ export default function App() {
           badge: "♀ Normal",
           color1: "#2f5233",
           color2: "#4a7c59",
-          desc: "Melanin penuh (Hijau/Kuning/Bond).",
-          genetics: "Bawaan Asli: Normal (Z⁺W)",
+          genetics: "Normal (Z⁺W)",
         };
       if (genotype === "ZcW0" || genotype === "W0Zc")
         result = {
@@ -197,8 +192,7 @@ export default function App() {
           badge: "♀ Cinnamon",
           color1: "#8b5a2b",
           color2: "#6b4226",
-          desc: "Melanin coklat aktif.",
-          genetics: "Bawaan Asli: Mutasi Cinnamon (ZᶜW)",
+          genetics: "Cinnamon (ZᶜW)",
         };
       if (genotype === "W0W0")
         result = {
@@ -206,7 +200,6 @@ export default function App() {
           badge: "Lethal",
           color1: "#ccc",
           color2: "#ccc",
-          desc: "Letal.",
           genetics: "Lethal Factor",
           isLethal: true,
         };
@@ -217,251 +210,188 @@ export default function App() {
       if (genotype === "HH")
         result = {
           label: "Hijau Murni",
-          badge: "Dominan",
           color1: "#2f5233",
           color2: "#4a7c59",
-          desc: "Melanin Penuh.",
-          genetics: "Bawaan Asli: Hijau Murni Dominan (HH)",
+          genetics: "Dominan (HH)",
         };
       if (genotype === "Hk")
         result = {
           label: "Hijau Split Kuning",
-          badge: "Carrier",
           color1: "#4a7c59",
           color2: "#84cc16",
-          desc: "Carrier kuning.",
-          genetics: "Bawaan Asli: Hijau + Gen Kuning Resesif (Hk)",
+          genetics: "Carrier (Hk)",
         };
       if (genotype === "HK")
         result = {
           label: "Bond / Pied",
-          badge: "Heterozigot",
           color1: "#4a7c59",
           color2: "#facc15",
-          desc: "Bercak hijau kuning.",
-          genetics: "Bawaan Asli: Campuran Hijau & Kuning (HK)",
+          genetics: "Bercak (HK)",
         };
       if (genotype === "kk" || genotype === "KK" || genotype === "kK")
         result = {
           label: "Kuning Murni",
-          badge: "Resesif",
           color1: "#f4d35e",
           color2: "#faf0ca",
-          desc: "Lipokrom murni.",
-          genetics: "Bawaan Asli: Kuning Resesif Penuh (kk)",
+          genetics: "Resesif (kk)",
         };
       return result;
     }
 
-    const getBaseGenName = (base) => {
-      if (base === "HH") return "Hijau Murni (HH)";
-      if (base === "Hk") return "Hijau Split Kuning (Hk)";
-      if (base === "HK") return "Bond / Campuran (HK)";
-      return "Kuning Murni (kk)";
-    };
-
     if (genotype.length === 4 && genotype.toLowerCase().includes("w")) {
       const baseGen = genotype.substring(0, 2);
       const whiteGen = genotype.substring(2, 4);
-      const baseName = getBaseGenName(baseGen);
-
       if (whiteGen.includes("WW"))
         return {
           label: "Letal (Mati di Telur)",
-          badge: "Lethal",
           color1: "#94a3b8",
           color2: "#e2e8f0",
-          desc: "WW Letal.",
-          genetics: "Lethal Factor Dominan",
+          genetics: "Lethal Dominan",
           isLethal: true,
         };
 
       if (whiteGen.includes("Ww")) {
-        let genDesc = `${baseName} + Faktor Putih Dominan (Ww)`;
         if (baseGen === "HH")
           return {
             label: "Starblue / Abu-abu",
-            badge: "HHWw",
             color1: "#64748b",
             color2: "#94a3b8",
-            desc: "Hijau tertutup putih.",
-            genetics: genDesc,
+            genetics: "Faktor Putih Dominan",
           };
         if (baseGen === "Hk")
           return {
             label: "Starblue Carrier Kuning",
-            badge: "HkWw",
             color1: "#64748b",
             color2: "#94a3b8",
-            desc: "Abu-abu split kuning.",
-            genetics: genDesc,
+            genetics: "Faktor Putih Dominan",
           };
         if (baseGen === "HK")
           return {
             label: "Bond Putih (Wdk)",
-            badge: "HKWw",
             color1: "#ffffff",
             color2: "#64748b",
-            desc: "Bercak putih dan abu-abu.",
-            genetics: genDesc,
+            genetics: "Faktor Putih Dominan",
           };
         return {
-          label: "Putih Dominan (Wdk)",
-          badge: "kkWw",
+          label: "Putih Dominan",
           color1: "#ffffff",
           color2: "#fef08a",
-          desc: "Visual dominan putih.",
-          genetics: genDesc,
+          genetics: "Faktor Putih Dominan",
         };
       }
 
-      let genDesc = `${baseName} + Tanpa Faktor Putih (ww)`;
       if (baseGen === "HH")
         return {
           label: "Hijau Murni",
-          badge: "HHww",
           color1: "#2f5233",
           color2: "#4a7c59",
-          desc: "Melanin penuh.",
-          genetics: genDesc,
+          genetics: "Melanin Penuh",
         };
       if (baseGen === "Hk")
         return {
           label: "Hijau Split Kuning",
-          badge: "Hkww",
           color1: "#4a7c59",
           color2: "#84cc16",
-          desc: "Visual hijau split kuning.",
-          genetics: genDesc,
+          genetics: "Carrier Kuning",
         };
       if (baseGen === "HK")
         return {
           label: "Bond / Pied",
-          badge: "HKww",
           color1: "#4a7c59",
           color2: "#facc15",
-          desc: "Bercak hijau kuning.",
-          genetics: genDesc,
+          genetics: "Bercak",
         };
       return {
         label: "Kuning Murni",
-        badge: "kkww",
         color1: "#f4d35e",
         color2: "#faf0ca",
-        desc: "Kuning murni.",
-        genetics: genDesc,
+        genetics: "Resesif Penuh",
       };
     }
 
     if (genotype.length === 4 && genotype.toLowerCase().includes("p")) {
       const baseGen = genotype.substring(0, 2);
       const resGen = genotype.substring(2, 4);
-      const baseName = getBaseGenName(baseGen);
 
       if (resGen === "pp") {
-        let genDesc = `${baseName} + Mutasi Putih Resesif Aktif (pp)`;
         if (baseGen === "HH")
           return {
             label: "Starblue (Abu-abu)",
-            badge: "HHpp",
             color1: "#64748b",
             color2: "#94a3b8",
-            desc: "Hijau hilang kuning.",
-            genetics: genDesc,
+            genetics: "Resesif Aktif",
           };
         if (baseGen === "HK" || baseGen === "Hk")
           return {
             label: "Bond Putih Resesif",
-            badge: "Bond pp",
             color1: "#ffffff",
             color2: "#64748b",
-            desc: "Bercak Abu & Putih bersih.",
-            genetics: genDesc,
+            genetics: "Resesif Aktif",
           };
         return {
           label: "Putih Resesif Polos",
-          badge: "kkpp",
           color1: "#ffffff",
           color2: "#f8fafc",
-          desc: "Putih bersih polos.",
-          genetics: genDesc,
+          genetics: "Resesif Aktif",
         };
       }
 
       if (resGen === "Pp" || resGen === "pP") {
-        let genDesc = `${baseName} + Carrier Putih Resesif (Pp)`;
         if (baseGen === "HH")
           return {
             label: "Hijau Carrier Putih",
-            badge: "Split Putih",
             color1: "#2f5233",
             color2: "#4a7c59",
-            desc: "Hijau bawa gen putih.",
-            genetics: genDesc,
+            genetics: "Carrier Putih",
           };
         if (baseGen === "HK")
           return {
             label: "Bond Carrier Putih",
-            badge: "Split Putih",
             color1: "#4a7c59",
             color2: "#facc15",
-            desc: "Bond bawa gen putih.",
-            genetics: genDesc,
+            genetics: "Carrier Putih",
           };
         if (baseGen === "Hk")
           return {
             label: "Hijau Double Carrier",
-            badge: "Split K&P",
             color1: "#4a7c59",
             color2: "#84cc16",
-            desc: "Bawa kuning & putih.",
-            genetics: genDesc,
+            genetics: "Carrier Putih & Kuning",
           };
         return {
           label: "Kuning Carrier Putih",
-          badge: "Split Putih",
           color1: "#f4d35e",
           color2: "#faf0ca",
-          desc: "Kuning bawa gen putih.",
-          genetics: genDesc,
+          genetics: "Carrier Putih",
         };
       }
 
-      let genDesc = `${baseName} + Tanpa Gen Putih (PP)`;
       if (baseGen === "HH")
         return {
           label: "Hijau Murni",
-          badge: "HHPP",
           color1: "#2f5233",
           color2: "#4a7c59",
-          desc: "Melanin penuh.",
-          genetics: genDesc,
+          genetics: "Tanpa Gen Putih",
         };
       if (baseGen === "Hk")
         return {
           label: "Hijau Split Kuning",
-          badge: "HkPP",
           color1: "#4a7c59",
           color2: "#84cc16",
-          desc: "Visual hijau split kuning.",
-          genetics: genDesc,
+          genetics: "Tanpa Gen Putih",
         };
       if (baseGen === "HK")
         return {
           label: "Bond / Pied",
-          badge: "HKPP",
           color1: "#4a7c59",
           color2: "#facc15",
-          desc: "Bercak hijau kuning.",
-          genetics: genDesc,
+          genetics: "Tanpa Gen Putih",
         };
       return {
         label: "Kuning Murni",
-        badge: "kkPP",
         color1: "#f4d35e",
         color2: "#faf0ca",
-        desc: "Kuning murni.",
-        genetics: genDesc,
+        genetics: "Tanpa Gen Putih",
       };
     }
 
@@ -474,11 +404,8 @@ export default function App() {
 
     const normalizeGenotype = (g) => {
       let normalized = g;
-      if (
-        mode === "mendel1_base" ||
-        mode === "mendel2_dom" ||
-        mode === "mendel2_res"
-      ) {
+      if (mode === "ab_x_ab") return normalized;
+      if (mode.includes("mendel")) {
         const arr = g.split("");
         for (let i = 0; i < arr.length; i++) {
           if (arr[i] === "K") arr[i] = "k";
@@ -491,7 +418,7 @@ export default function App() {
     const normG1 = normalizeGenotype(g1);
     const normG2 = normalizeGenotype(g2);
 
-    if (mode.startsWith("mendel1")) {
+    if (mode === "mendel1_base") {
       gametesP1 = normG1.split("");
       gametesP2 = normG2.split("");
     } else if (mode === "sex_linked_cin") {
@@ -526,7 +453,7 @@ export default function App() {
         let allele2 = gametesP2[j];
 
         let genotype = "";
-        if (mode.startsWith("mendel1")) {
+        if (mode === "mendel1_base") {
           genotype = [allele1, allele2]
             .sort((a, b) => (a === "H" || a === "W" ? -1 : 1))
             .join("");
@@ -539,6 +466,14 @@ export default function App() {
             return 0;
           });
           genotype = alleles.join("");
+        } else if (mode === "ab_x_ab") {
+          let baseTrait = [allele1[0], allele2[0]]
+            .sort((a, b) => (a === a.toUpperCase() ? -1 : 1))
+            .join("");
+          let secondaryTrait = [allele1[1], allele2[1]]
+            .sort((a, b) => (a === a.toUpperCase() ? -1 : 1))
+            .join("");
+          genotype = baseTrait + secondaryTrait;
         } else {
           let baseTrait = [allele1[0], allele2[0]]
             .sort((a, b) => (a === "H" ? -1 : 1))
@@ -555,9 +490,8 @@ export default function App() {
           mode === "mendel2_res" ||
           mode === "mendel1_base"
         ) {
-          if (displayGenotype.substring(0, 2) === "Hk") {
+          if (displayGenotype.substring(0, 2) === "Hk")
             displayGenotype = "HK" + displayGenotype.substring(2);
-          }
         }
 
         row.push(displayGenotype);
@@ -599,47 +533,266 @@ export default function App() {
     };
   };
 
-  const handleSilangkanF1 = () => {
-    const result = calculatePunnett(p1Input, p2Input, crossMode);
-    setF1Data(result);
-    setF2Data(null);
+  // --- Algoritma Pedigree & Koefisien Inbreeding ---
+  const buildPedigreeGraph = (currentCrosses) => {
+    let graph = {};
+    let addInd = (id, sireId, damId, depth) => {
+      graph[id] = { id, sireId, damId, depth, F: 0 };
+      return graph[id];
+    };
 
-    let validMales = result.genoRatios.filter(
-      (g) => !g.genotype.includes("WW"),
-    );
-    let validFemales = result.genoRatios.filter(
-      (g) => !g.genotype.includes("WW"),
-    );
+    let memo = {};
+    const getKinship = (idA, idB) => {
+      if (!idA || !idB) return 0;
+      if (idA === idB) return 0.5 * (1 + graph[idA].F);
+
+      let key = idA < idB ? `${idA}_${idB}` : `${idB}_${idA}`;
+      if (memo[key] !== undefined) return memo[key];
+
+      let indA = graph[idA];
+      let indB = graph[idB];
+      let res = 0;
+
+      if (
+        indA.depth > indB.depth ||
+        (indA.depth === indB.depth && indA.id > indB.id)
+      ) {
+        res =
+          0.5 * getKinship(indA.sireId, idB) +
+          0.5 * getKinship(indA.damId, idB);
+      } else {
+        res =
+          0.5 * getKinship(idA, indB.sireId) +
+          0.5 * getKinship(idA, indB.damId);
+      }
+      memo[key] = res;
+      return res;
+    };
+
+    addInd("P1", null, null, 0);
+    addInd("P2", null, null, 0);
+
+    currentCrosses.forEach((cross) => {
+      if (cross.sireSource.startsWith("OC_") && !graph[cross.sireSource])
+        addInd(cross.sireSource, null, null, 0);
+      if (cross.damSource.startsWith("OC_") && !graph[cross.damSource])
+        addInd(cross.damSource, null, null, 0);
+
+      let sNodeId = cross.sireSource;
+      let dNodeId = cross.damSource;
+
+      if (cross.sireSource.startsWith("C")) {
+        let pCross = currentCrosses.find((c) => c.id === cross.sireSource);
+        sNodeId = `Sire_for_${cross.id}`;
+        let depth =
+          Math.max(
+            graph[pCross.sireNodeId].depth,
+            graph[pCross.damNodeId].depth,
+          ) + 1;
+        addInd(sNodeId, pCross.sireNodeId, pCross.damNodeId, depth);
+        graph[sNodeId].F = getKinship(pCross.sireNodeId, pCross.damNodeId);
+      }
+
+      if (cross.damSource.startsWith("C")) {
+        let pCross = currentCrosses.find((c) => c.id === cross.damSource);
+        dNodeId = `Dam_for_${cross.id}`;
+        let depth =
+          Math.max(
+            graph[pCross.sireNodeId].depth,
+            graph[pCross.damNodeId].depth,
+          ) + 1;
+        addInd(dNodeId, pCross.sireNodeId, pCross.damNodeId, depth);
+        graph[dNodeId].F = getKinship(pCross.sireNodeId, pCross.damNodeId);
+      }
+
+      cross.sireNodeId = sNodeId;
+      cross.damNodeId = dNodeId;
+
+      cross.F = getKinship(sNodeId, dNodeId);
+    });
+
+    return { graph, getKinship };
+  };
+
+  // --- Algoritma Serapan Darah (Bloodline) ---
+  const getFounderBloodline = (sourceId, allCrosses) => {
+    if (sourceId === "P1") return { P1: 100 };
+    if (sourceId === "P2") return { P2: 100 };
+    if (sourceId.startsWith("OC_")) return { [sourceId]: 100 };
+    if (sourceId.startsWith("C")) {
+      let pCross = allCrosses.find((c) => c.id === sourceId);
+      return pCross ? pCross.bloodline : {};
+    }
+    return {};
+  };
+
+  const calculateBloodline = (sireSrc, damSrc, allCrosses) => {
+    let sB = getFounderBloodline(sireSrc, allCrosses);
+    let dB = getFounderBloodline(damSrc, allCrosses);
+    let cB = {};
+    let keys = new Set([...Object.keys(sB), ...Object.keys(dB)]);
+    keys.forEach((k) => {
+      cB[k] = ((sB[k] || 0) + (dB[k] || 0)) / 2;
+    });
+    return cB;
+  };
+
+  const getAvailableGenotypes = (source, isMale) => {
+    if (source === "P1") return [{ val: p1Input, label: p1Input }];
+    if (source === "P2") return [{ val: p2Input, label: p2Input }];
+    if (source === "OC") return getDropdownOptions(crossMode, isMale);
+
+    const cross = crosses.find((c) => c.id === source);
+    if (!cross) return [];
+
+    let options = cross.data.genoRatios.map((g) => ({
+      val: g.genotype,
+      label: g.genotype + " - " + getPhenotype(g.genotype).label,
+    }));
+    options = options.filter((o) => !getPhenotype(o.val).isLethal);
 
     if (crossMode === "sex_linked_cin") {
-      validMales = validMales.filter((g) => !g.genotype.includes("W0"));
-      validFemales = validFemales.filter((g) => g.genotype.includes("W0"));
+      if (isMale) options = options.filter((o) => !o.val.includes("W0"));
+      else options = options.filter((o) => o.val.includes("W0"));
     }
+    return options;
+  };
 
-    if (validMales.length > 0) setF2Parent1(validMales[0].genotype);
-    if (validFemales.length > 0) setF2Parent2(validFemales[0].genotype);
+  useEffect(() => {
+    if (crosses.length === 0) return;
+    const sOpts = getAvailableGenotypes(nextSireSource, true);
+    if (sOpts.length > 0 && !sOpts.find((o) => o.val === nextSireGenotype))
+      setNextSireGenotype(sOpts[0].val);
+
+    const dOpts = getAvailableGenotypes(nextDamSource, false);
+    if (dOpts.length > 0 && !dOpts.find((o) => o.val === nextDamGenotype))
+      setNextDamGenotype(dOpts[0].val);
+  }, [nextSireSource, nextDamSource, crosses, crossMode]);
+
+  const handleSimulateFirst = () => {
+    const initialCross = {
+      id: "C1",
+      title: "Generasi Pertama (F1)",
+      sireSource: "P1",
+      damSource: "P2",
+      sireGenotype: p1Input,
+      damGenotype: p2Input,
+    };
+
+    initialCross.data = calculatePunnett(p1Input, p2Input, crossMode);
+
+    const { graph } = buildPedigreeGraph([initialCross]);
+    initialCross.F = initialCross.F || 0;
+    initialCross.bloodline = calculateBloodline("P1", "P2", []);
+
+    setCrosses([initialCross]);
+    setNextSireSource("C1");
+    setNextDamSource("C1");
 
     setTimeout(() => {
-      f1Ref.current?.scrollIntoView({ behavior: "smooth" });
+      latestCrossRef.current?.scrollIntoView({ behavior: "smooth" });
     }, 100);
   };
 
-  const handleSilangkanF2 = () => {
-    const result = calculatePunnett(f2Parent1, f2Parent2, crossMode);
-    setF2Data(result);
+  const handleSimulateNext = () => {
+    let actualSireSource = nextSireSource;
+    let actualDamSource = nextDamSource;
+
+    if (actualSireSource === "OC") actualSireSource = `OC_${Date.now()}_S`;
+    if (actualDamSource === "OC") actualDamSource = `OC_${Date.now()}_D`;
+
+    const newCrossId = `C${crosses.length + 1}`;
+    let title = `Generasi ${crosses.length + 1}`;
+    if (
+      nextSireSource.startsWith("C") &&
+      nextDamSource.startsWith("C") &&
+      nextSireSource === nextDamSource
+    )
+      title = `Inbreeding F${crosses.length + 1}`;
+    else if (nextSireSource === "P1" || nextDamSource === "P2")
+      title = `Backcross BC`;
+    else if (nextSireSource === "OC" || nextDamSource === "OC")
+      title = `Outcross OC`;
+
+    const newCross = {
+      id: newCrossId,
+      title: title,
+      sireSource: actualSireSource,
+      damSource: actualDamSource,
+      sireGenotype: nextSireGenotype,
+      damGenotype: nextDamGenotype,
+    };
+
+    const tempCrosses = [...crosses, newCross];
+
+    const { graph } = buildPedigreeGraph(tempCrosses);
+    newCross.F = newCross.F || 0;
+    newCross.data = calculatePunnett(
+      nextSireGenotype,
+      nextDamGenotype,
+      crossMode,
+    );
+    newCross.bloodline = calculateBloodline(
+      actualSireSource,
+      actualDamSource,
+      crosses,
+    );
+
+    setCrosses(tempCrosses);
+    setNextSireSource(newCrossId);
+    setNextDamSource(newCrossId);
+
     setTimeout(() => {
-      f2Ref.current?.scrollIntoView({ behavior: "smooth" });
+      latestCrossRef.current?.scrollIntoView({ behavior: "smooth" });
     }, 100);
   };
 
-  // --- Visual Components moved outside render ---
+  const getSourceLabel = (src) => {
+    if (src === "P1") return "Jantan Awal (P1)";
+    if (src === "P2") return "Betina Awal (P2)";
+    if (src === "OC") return "Outcross Baru (OC)";
+    if (src.startsWith("C")) return `Anakan ${src}`;
+    if (src.startsWith("OC_")) return `Outcross Baru`;
+    return src;
+  };
 
-  const renderPunnettBoard = (data, title) => {
-    if (!data) return null;
+  // --- Visual Components ---
+  const ColorSwatch = ({ color1, color2, isLethal }) => (
+    <div className="relative">
+      <div
+        className={`w-10 h-10 md:w-12 md:h-12 rounded-full border-2 border-slate-200 shadow-sm ${isLethal ? "opacity-30" : ""}`}
+        style={{
+          background: `linear-gradient(135deg, ${color1} 40%, ${color2} 60%)`,
+        }}
+      ></div>
+      {isLethal && (
+        <EggOff size={20} className="absolute inset-0 m-auto text-slate-500" />
+      )}
+    </div>
+  );
 
-    const isF2 = title.includes("F2");
-    const bgHeader = isF2 ? "bg-slate-800" : "bg-teal-700";
-    const textHighlight = isF2 ? "text-slate-600" : "text-teal-600";
+  const MiniColorSwatch = ({ color1, color2, isLethal }) => (
+    <div className="relative flex-shrink-0">
+      <div
+        className={`w-8 h-8 rounded-full border border-slate-300 shadow-sm ${isLethal ? "opacity-30" : ""}`}
+        style={{
+          background: `linear-gradient(135deg, ${color1} 40%, ${color2} 60%)`,
+        }}
+      ></div>
+      {isLethal && (
+        <EggOff size={14} className="absolute inset-0 m-auto text-slate-500" />
+      )}
+    </div>
+  );
+
+  const renderPunnettBoard = (crossObj, idx) => {
+    if (!crossObj || !crossObj.data) return null;
+    const data = crossObj.data;
+
+    const isF1 = idx === 0;
+    const bgHeader = isF1 ? "bg-teal-700" : "bg-slate-800";
+    const textHighlight = isF1 ? "text-teal-600" : "text-slate-600";
+    const fPercentage = (crossObj.F * 100).toFixed(2);
 
     return (
       <div className="space-y-4 md:space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 mt-6 md:mt-8 font-sans">
@@ -648,15 +801,60 @@ export default function App() {
         >
           <div>
             <h2 className="text-lg md:text-xl font-bold flex items-center gap-2">
-              <Activity size={20} className="text-teal-300" /> Analisis Hasil:{" "}
-              {title}
+              {isF1 ? (
+                <Activity size={20} className="text-teal-300" />
+              ) : (
+                <GitBranch size={20} className="text-blue-300" />
+              )}
+              Hasil: {crossObj.title} ({crossObj.id})
             </h2>
+            <div className="text-xs text-white/80 mt-1.5 flex flex-col gap-1.5 font-medium">
+              <div className="flex items-center gap-1">
+                Jantan:{" "}
+                <span className="font-bold text-blue-200">
+                  {getSourceLabel(crossObj.sireSource)}
+                </span>{" "}
+                × Betina:{" "}
+                <span className="font-bold text-pink-200">
+                  {getSourceLabel(crossObj.damSource)}
+                </span>
+              </div>
+              {/* Visualisasi Serapan Darah / Bloodline */}
+              <div className="flex flex-wrap items-center gap-1.5 mt-0.5">
+                <span className="text-[10px] md:text-xs text-white/70 uppercase tracking-wider mr-1">
+                  Darah:
+                </span>
+                {Object.entries(crossObj.bloodline).map(([f, pct]) => {
+                  if (pct === 0) return null;
+                  let label = f;
+                  if (f === "P1") label = "P1 (♂ Awal)";
+                  else if (f === "P2") label = "P2 (♀ Awal)";
+                  else if (f.startsWith("OC_")) label = "OC (Outcross)";
+
+                  return (
+                    <span
+                      key={f}
+                      className="bg-white/20 px-2 py-0.5 rounded text-[10px] md:text-xs font-bold text-white border border-white/10 shadow-sm"
+                    >
+                      {label} {pct % 1 === 0 ? pct : pct.toFixed(1)}%
+                    </span>
+                  );
+                })}
+              </div>
+            </div>
           </div>
-          <div className="bg-black/20 px-3 md:px-4 py-1.5 md:py-2 rounded-lg border border-white/10 flex items-center gap-2 w-full md:w-auto">
-            <Dna size={16} />
-            <span className="text-xs md:text-sm font-semibold">
-              Sampel: {data.total} Kombinasi
-            </span>
+          <div className="flex flex-col sm:flex-row items-end sm:items-center gap-2 w-full sm:w-auto">
+            {crossObj.F > 0 && (
+              <div className="bg-orange-500/90 text-white px-3 py-1.5 rounded-lg border border-white/20 flex items-center gap-1.5 text-xs md:text-sm font-bold shadow-sm">
+                <AlertTriangle size={14} /> Inbreeding: {fPercentage}%
+              </div>
+            )}
+            <div className="bg-black/20 px-3 md:px-4 py-1.5 md:py-2 rounded-lg border border-white/10 flex items-center gap-2">
+              <Dna size={16} />
+              <span className="text-xs md:text-sm font-semibold">
+                {data.total} Kombinasi
+              </span>
+            </div>
           </div>
         </div>
 
@@ -754,7 +952,7 @@ export default function App() {
             </div>
             <div className="p-3 md:p-4 flex-1">
               <ul className="space-y-2 md:space-y-3">
-                {data.genoRatios.map((item, idx) => {
+                {data.genoRatios.map((item, idxx) => {
                   const isLethal = item.genotype.includes("WW");
                   const displayGeno = item.genotype
                     .replace(/Z\+/g, "Z⁺")
@@ -762,7 +960,7 @@ export default function App() {
                     .replace(/W0/g, "W");
                   return (
                     <li
-                      key={idx}
+                      key={idxx}
                       className={`flex justify-between items-center p-2 md:p-3 rounded-lg border ${isLethal ? "bg-slate-50/50 border-slate-200" : "bg-white/50 border-slate-100 shadow-sm"}`}
                     >
                       <div className="flex items-center gap-2 md:gap-3">
@@ -802,7 +1000,7 @@ export default function App() {
             </div>
             <div className="p-3 md:p-4 flex-1">
               <ul className="space-y-2 md:space-y-3">
-                {data.phenoRatios.map((item, idx) => {
+                {data.phenoRatios.map((item, idxx) => {
                   const isLethal = item.phenotype.includes("Letal");
                   const sampleGeno = data.square
                     .flat()
@@ -810,7 +1008,7 @@ export default function App() {
                   const pheno = getPhenotype(sampleGeno);
                   return (
                     <li
-                      key={idx}
+                      key={idxx}
                       className={`flex justify-between items-center p-2 md:p-3 rounded-lg border ${isLethal ? "bg-slate-50/50 border-slate-200" : "bg-white/50 border-slate-100 shadow-sm"}`}
                     >
                       <div className="flex items-center gap-2 md:gap-3">
@@ -867,9 +1065,8 @@ export default function App() {
                 Peringatan Gen Letal
               </h4>
               <p className="text-[10px] md:text-xs text-slate-500 mt-1 leading-relaxed">
-                Persilangan ini menghasilkan genotipe letal dominan homozigot
-                (WW). Embrio akan mengalami kematian dini di dalam cangkang
-                (Dead in Shell).
+                Persilangan ini menghasilkan genotipe letal dominan homozigot.
+                Embrio akan mengalami kematian dini.
               </p>
             </div>
           </div>
@@ -888,16 +1085,15 @@ export default function App() {
       <div className="max-w-[1400px] w-full mx-auto space-y-4 md:space-y-6 relative z-10">
         <header className="bg-white/90 backdrop-blur-md rounded-xl shadow-sm border border-slate-200/50 p-4 md:p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <div className="flex items-center gap-3 md:gap-4">
-            <div className="p-2 md:p-3 bg-teal-600 text-white rounded-xl shadow-inner">
-              <Bird size={24} strokeWidth={1.5} />
+            {/* Ikon DNA Diubah Menjadi Abu-abu Sesuai Permintaan */}
+            <div className="p-2 md:p-3 bg-slate-100 border border-slate-200 rounded-xl shadow-inner">
+              <Dna size={24} strokeWidth={2} className="text-slate-500" />
             </div>
             <div>
               <h1 className="text-lg md:text-2xl font-black text-slate-800 tracking-tight">
-                Avigen <span className="text-teal-600 font-light">Pro</span>
+                Avigen Pro{" "}
+                <span className="text-teal-600 font-light">By CBSM</span>
               </h1>
-              <p className="text-[10px] md:text-xs text-slate-500 font-medium">
-                Canary Genetics Prediction Software v7.0
-              </p>
             </div>
           </div>
         </header>
@@ -905,43 +1101,50 @@ export default function App() {
         <div className="bg-white/90 backdrop-blur-md rounded-xl shadow-sm border border-slate-200/50 overflow-hidden">
           <div className="bg-slate-50/80 border-b border-slate-200/50 p-3 md:p-4 flex flex-col xl:flex-row xl:items-center justify-between gap-3 md:gap-4">
             <h2 className="text-xs md:text-sm font-bold text-slate-700 uppercase tracking-wider flex items-center gap-2 whitespace-nowrap">
-              <Settings2 size={16} /> Konfigurasi Indukan
+              <Settings2 size={16} /> Konfigurasi Jantan & Betina Awal (P1 & P2)
             </h2>
 
-            <div className="flex flex-wrap bg-white/80 border border-slate-200/50 p-1 rounded-lg w-full xl:w-auto text-[10px] md:text-xs font-semibold shadow-sm">
+            {/* Navigasi Tab Fit Screen & Disusun Ulang (Satu Garis Lurus) */}
+            <div className="flex w-full xl:w-auto bg-white/80 border border-slate-200/50 p-1 rounded-lg shadow-sm gap-0.5 sm:gap-1 overflow-x-auto">
               <button
                 onClick={() => handleModeChange("mendel1_base")}
-                className={`flex-1 px-2 md:px-3 py-1.5 md:py-2 rounded-md transition-all ${crossMode === "mendel1_base" ? "bg-teal-50 text-teal-700 shadow-sm" : "text-slate-500 hover:text-slate-700"}`}
+                className={`flex-1 whitespace-nowrap px-1.5 sm:px-2 py-2 rounded-md text-[9px] sm:text-[10px] md:text-xs font-bold transition-all ${crossMode === "mendel1_base" ? "bg-teal-50 text-teal-700 shadow-sm ring-1 ring-teal-200" : "text-slate-500 hover:text-slate-700 hover:bg-slate-50"}`}
               >
-                Mendel 1 (Segregasi)
+                Mendel 1
               </button>
               <button
                 onClick={() => handleModeChange("sex_linked_cin")}
-                className={`flex-1 px-2 md:px-3 py-1.5 md:py-2 rounded-md transition-all ${crossMode === "sex_linked_cin" ? "bg-teal-50 text-teal-700 shadow-sm" : "text-slate-500 hover:text-slate-700"}`}
+                className={`flex-1 whitespace-nowrap px-1.5 sm:px-2 py-2 rounded-md text-[9px] sm:text-[10px] md:text-xs font-bold transition-all ${crossMode === "sex_linked_cin" ? "bg-teal-50 text-teal-700 shadow-sm ring-1 ring-teal-200" : "text-slate-500 hover:text-slate-700 hover:bg-slate-50"}`}
               >
-                Sex-Linked (Taut Seks)
+                Sex-Linked
               </button>
               <button
                 onClick={() => handleModeChange("mendel2_dom")}
-                className={`flex-1 px-2 md:px-3 py-1.5 md:py-2 rounded-md transition-all ${crossMode === "mendel2_dom" ? "bg-teal-50 text-teal-700 shadow-sm" : "text-slate-500 hover:text-slate-700"}`}
+                className={`flex-1 whitespace-nowrap px-1.5 sm:px-2 py-2 rounded-md text-[9px] sm:text-[10px] md:text-xs font-bold transition-all ${crossMode === "mendel2_dom" ? "bg-teal-50 text-teal-700 shadow-sm ring-1 ring-teal-200" : "text-slate-500 hover:text-slate-700 hover:bg-slate-50"}`}
               >
-                Dihibrid (P. Dominan)
+                Dihibrid Dom
               </button>
               <button
                 onClick={() => handleModeChange("mendel2_res")}
-                className={`flex-1 px-2 md:px-3 py-1.5 md:py-2 rounded-md transition-all ${crossMode === "mendel2_res" ? "bg-teal-50 text-teal-700 shadow-sm" : "text-slate-500 hover:text-slate-700"}`}
+                className={`flex-1 whitespace-nowrap px-1.5 sm:px-2 py-2 rounded-md text-[9px] sm:text-[10px] md:text-xs font-bold transition-all ${crossMode === "mendel2_res" ? "bg-teal-50 text-teal-700 shadow-sm ring-1 ring-teal-200" : "text-slate-500 hover:text-slate-700 hover:bg-slate-50"}`}
               >
-                Dihibrid (P. Resesif)
+                Dihibrid Res
+              </button>
+              <button
+                onClick={() => handleModeChange("ab_x_ab")}
+                className={`flex-1 whitespace-nowrap px-1.5 sm:px-2 py-2 rounded-md text-[9px] sm:text-[10px] md:text-xs font-bold transition-all ${crossMode === "ab_x_ab" ? "bg-teal-50 text-teal-700 shadow-sm ring-1 ring-teal-200" : "text-slate-500 hover:text-slate-700 hover:bg-slate-50"}`}
+              >
+                Gen Dasar
               </button>
             </div>
           </div>
 
           <div className="p-3 md:p-6">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 md:gap-4 items-stretch">
+              {/* P1 Input */}
               <div className="lg:col-span-5 relative border-2 border-blue-100/50 bg-blue-50/20 rounded-xl p-3 md:p-4 mt-3 lg:mt-0 flex flex-col justify-between">
                 <div className="absolute -top-3 left-3 md:left-4 bg-white border border-blue-200 text-blue-700 text-[9px] md:text-[10px] font-bold px-2 md:px-3 py-0.5 rounded-full flex items-center gap-1 shadow-sm whitespace-nowrap">
-                  <span>♂</span> Jantan{" "}
-                  {crossMode === "sex_linked_cin" && "- ZZ"}
+                  <span>♂</span> Jantan (P1)
                 </div>
                 <div className="mt-1">
                   <label className="block text-[9px] md:text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 md:mb-1.5">
@@ -990,10 +1193,10 @@ export default function App() {
                 })()}
               </div>
 
+              {/* P2 Input */}
               <div className="lg:col-span-5 relative border-2 border-pink-100/50 bg-pink-50/20 rounded-xl p-3 md:p-4 mt-3 lg:mt-0 flex flex-col justify-between">
                 <div className="absolute -top-3 left-3 md:left-4 bg-white border border-pink-200 text-pink-700 text-[9px] md:text-[10px] font-bold px-2 md:px-3 py-0.5 rounded-full flex items-center gap-1 shadow-sm whitespace-nowrap">
-                  <span>♀</span> Betina{" "}
-                  {crossMode === "sex_linked_cin" && "- ZW"}
+                  <span>♀</span> Betina (P2)
                 </div>
                 <div className="mt-1">
                   <label className="block text-[9px] md:text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 md:mb-1.5">
@@ -1044,82 +1247,88 @@ export default function App() {
 
               <div className="lg:col-span-2 mt-3 md:mt-4 lg:mt-0 flex flex-col justify-end">
                 <button
-                  onClick={handleSilangkanF1}
+                  onClick={handleSimulateFirst}
                   className="w-full h-[60px] md:h-full lg:min-h-[104px] bg-teal-600 hover:bg-teal-700 text-white font-bold rounded-xl shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-1.5 md:gap-2 text-xs md:text-sm xl:text-base backdrop-blur-sm"
                 >
-                  <Activity size={16} className="md:w-5 md:h-5" /> SIMULASI F1
+                  <Activity size={16} className="md:w-5 md:h-5" /> SIMULASI P1 x
+                  P2
                 </button>
               </div>
             </div>
           </div>
         </div>
 
-        <div ref={f1Ref}>
-          {renderPunnettBoard(f1Data, "Generasi Pertama (F1)")}
-        </div>
+        {/* Dynamic Generasi Render */}
+        {crosses.map((cross, idx) => (
+          <div
+            key={cross.id}
+            ref={idx === crosses.length - 1 ? latestCrossRef : null}
+          >
+            {renderPunnettBoard(cross, idx)}
+          </div>
+        ))}
 
-        {f1Data && (
+        {/* Lanjut Generasi / Inbreeding / Backcross */}
+        {crosses.length > 0 && crosses.length < 6 && (
           <div className="bg-white/90 backdrop-blur-md rounded-xl shadow-sm border border-slate-200/50 mt-4 md:mt-6 animate-in fade-in duration-700 overflow-hidden">
-            <div className="bg-slate-50/80 border-b border-slate-200/50 p-3 md:p-4">
+            <div className="bg-slate-50/80 border-b border-slate-200/50 p-3 md:p-4 flex justify-between items-center">
               <h2 className="text-xs md:text-sm font-bold text-slate-700 uppercase tracking-wider flex items-center gap-2">
-                <GitBranch size={16} /> Modul Inbreeding (Generasi F2)
+                <GitBranch size={16} /> Lanjut Persilangan Berikutnya (Inbreeding
+                / Backcross / Outcross)
               </h2>
             </div>
 
             <div className="p-3 md:p-6">
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 md:gap-4 items-stretch">
-                <div className="lg:col-span-5 relative mt-1 lg:mt-0 flex flex-col justify-between">
-                  <label className="block text-[9px] md:text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 md:mb-1.5">
-                    ♂ Anakan Jantan F1
-                  </label>
-                  <div className="relative">
-                    <select
-                      value={f2Parent1}
-                      onChange={(e) => setF2Parent1(e.target.value)}
-                      className="w-full p-2 md:p-2.5 pl-2 md:pl-3 pr-6 md:pr-8 border border-slate-300/80 rounded-lg text-xs md:text-sm font-medium text-slate-700 focus:ring-2 focus:ring-slate-500 appearance-none bg-slate-50/90"
-                    >
-                      {f1Data.genoRatios
-                        .filter((g) => !g.genotype.includes("WW"))
-                        .filter(
-                          (g) =>
-                            crossMode !== "sex_linked_cin" ||
-                            !g.genotype.includes("W0"),
-                        )
-                        .map((opt) => {
-                          const display = opt.genotype
-                            .replace(/Z\+/g, "Z⁺")
-                            .replace(/Zc/g, "Zᶜ")
-                            .replace(/W0/g, "W");
-                          return (
-                            <option key={opt.genotype} value={opt.genotype}>
-                              {display} - {getPhenotype(opt.genotype).label}
+                <div className="lg:col-span-5 flex flex-col gap-3">
+                  <div className="bg-blue-50/50 border border-blue-100 rounded-lg p-3">
+                    <label className="block text-[9px] md:text-[10px] font-bold text-blue-700 uppercase tracking-wider mb-2">
+                      1. Pilih Sumber Jantan ♂
+                    </label>
+                    <div className="flex gap-2">
+                      <select
+                        value={nextSireSource}
+                        onChange={(e) => setNextSireSource(e.target.value)}
+                        className="w-1/3 p-2 border border-slate-300 rounded-md text-[10px] md:text-xs font-semibold focus:ring-2 focus:ring-blue-500"
+                      >
+                        <option value="P1">Jantan P1</option>
+                        {crosses.map((c) => (
+                          <option key={`S_${c.id}`} value={c.id}>
+                            Anakan {c.id}
+                          </option>
+                        ))}
+                        <option value="OC">Outcross (OC)</option>
+                      </select>
+                      <select
+                        value={nextSireGenotype}
+                        onChange={(e) => setNextSireGenotype(e.target.value)}
+                        className="w-2/3 p-2 border border-slate-300 rounded-md text-[10px] md:text-xs font-medium focus:ring-2 focus:ring-blue-500"
+                      >
+                        {getAvailableGenotypes(nextSireSource, true).map(
+                          (opt) => (
+                            <option key={opt.val} value={opt.val}>
+                              {opt.label}
                             </option>
-                          );
-                        })}
-                    </select>
-                    <ChevronDown
-                      size={14}
-                      className="absolute right-2 md:right-3 top-2.5 md:top-3 text-slate-400 pointer-events-none"
-                    />
+                          ),
+                        )}
+                      </select>
+                    </div>
                   </div>
-                  {f2Parent1 &&
+                  {nextSireGenotype &&
                     (() => {
-                      const pheno = getPhenotype(f2Parent1);
+                      const pheno = getPhenotype(nextSireGenotype);
                       return (
-                        <div className="mt-3 bg-white/80 backdrop-blur p-3 rounded-lg border border-slate-200/50 flex items-center gap-3 shadow-sm">
+                        <div className="bg-white/80 backdrop-blur p-2 rounded-lg border border-slate-200 flex items-center gap-3 shadow-sm">
                           <MiniColorSwatch
                             color1={pheno.color1}
                             color2={pheno.color2}
                             isLethal={pheno.isLethal}
                           />
                           <div className="flex-1 min-w-0">
-                            <div className="text-[11px] md:text-xs font-bold text-slate-800 leading-tight">
+                            <div className="text-[10px] md:text-xs font-bold text-slate-800 leading-tight">
                               {pheno.label}
                             </div>
-                            <div className="text-[9px] md:text-[10px] text-slate-500 leading-snug mt-1">
-                              <span className="font-bold text-slate-600">
-                                Genetik Dasar:
-                              </span>{" "}
+                            <div className="text-[9px] text-slate-500 leading-snug">
                               {pheno.genetics.replace("Bawaan Asli: ", "")}
                             </div>
                           </div>
@@ -1128,58 +1337,55 @@ export default function App() {
                     })()}
                 </div>
 
-                <div className="lg:col-span-5 relative mt-2 md:mt-3 lg:mt-0 flex flex-col justify-between">
-                  <label className="block text-[9px] md:text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 md:mb-1.5">
-                    ♀ Anakan Betina F1
-                  </label>
-                  <div className="relative">
-                    <select
-                      value={f2Parent2}
-                      onChange={(e) => setF2Parent2(e.target.value)}
-                      className="w-full p-2 md:p-2.5 pl-2 md:pl-3 pr-6 md:pr-8 border border-slate-300/80 rounded-lg text-xs md:text-sm font-medium text-slate-700 focus:ring-2 focus:ring-slate-500 appearance-none bg-slate-50/90"
-                    >
-                      {f1Data.genoRatios
-                        .filter((g) => !g.genotype.includes("WW"))
-                        .filter(
-                          (g) =>
-                            crossMode !== "sex_linked_cin" ||
-                            g.genotype.includes("W0"),
-                        )
-                        .map((opt) => {
-                          const display = opt.genotype
-                            .replace(/Z\+/g, "Z⁺")
-                            .replace(/Zc/g, "Zᶜ")
-                            .replace(/W0/g, "W");
-                          return (
-                            <option key={opt.genotype} value={opt.genotype}>
-                              {display} - {getPhenotype(opt.genotype).label}
+                <div className="lg:col-span-5 flex flex-col gap-3">
+                  <div className="bg-pink-50/50 border border-pink-100 rounded-lg p-3">
+                    <label className="block text-[9px] md:text-[10px] font-bold text-pink-700 uppercase tracking-wider mb-2">
+                      2. Pilih Sumber Betina ♀
+                    </label>
+                    <div className="flex gap-2">
+                      <select
+                        value={nextDamSource}
+                        onChange={(e) => setNextDamSource(e.target.value)}
+                        className="w-1/3 p-2 border border-slate-300 rounded-md text-[10px] md:text-xs font-semibold focus:ring-2 focus:ring-pink-500"
+                      >
+                        <option value="P2">Betina P2</option>
+                        {crosses.map((c) => (
+                          <option key={`D_${c.id}`} value={c.id}>
+                            Anakan {c.id}
+                          </option>
+                        ))}
+                        <option value="OC">Outcross (OC)</option>
+                      </select>
+                      <select
+                        value={nextDamGenotype}
+                        onChange={(e) => setNextDamGenotype(e.target.value)}
+                        className="w-2/3 p-2 border border-slate-300 rounded-md text-[10px] md:text-xs font-medium focus:ring-2 focus:ring-pink-500"
+                      >
+                        {getAvailableGenotypes(nextDamSource, false).map(
+                          (opt) => (
+                            <option key={opt.val} value={opt.val}>
+                              {opt.label}
                             </option>
-                          );
-                        })}
-                    </select>
-                    <ChevronDown
-                      size={14}
-                      className="absolute right-2 md:right-3 top-2.5 md:top-3 text-slate-400 pointer-events-none"
-                    />
+                          ),
+                        )}
+                      </select>
+                    </div>
                   </div>
-                  {f2Parent2 &&
+                  {nextDamGenotype &&
                     (() => {
-                      const pheno = getPhenotype(f2Parent2);
+                      const pheno = getPhenotype(nextDamGenotype);
                       return (
-                        <div className="mt-3 bg-white/80 backdrop-blur p-3 rounded-lg border border-slate-200/50 flex items-center gap-3 shadow-sm">
+                        <div className="bg-white/80 backdrop-blur p-2 rounded-lg border border-slate-200 flex items-center gap-3 shadow-sm">
                           <MiniColorSwatch
                             color1={pheno.color1}
                             color2={pheno.color2}
                             isLethal={pheno.isLethal}
                           />
                           <div className="flex-1 min-w-0">
-                            <div className="text-[11px] md:text-xs font-bold text-slate-800 leading-tight">
+                            <div className="text-[10px] md:text-xs font-bold text-slate-800 leading-tight">
                               {pheno.label}
                             </div>
-                            <div className="text-[9px] md:text-[10px] text-slate-500 leading-snug mt-1">
-                              <span className="font-bold text-slate-600">
-                                Genetik Dasar:
-                              </span>{" "}
+                            <div className="text-[9px] text-slate-500 leading-snug">
                               {pheno.genetics.replace("Bawaan Asli: ", "")}
                             </div>
                           </div>
@@ -1188,12 +1394,12 @@ export default function App() {
                     })()}
                 </div>
 
-                <div className="lg:col-span-2 mt-3 md:mt-4 lg:mt-0 flex flex-col justify-end">
+                <div className="lg:col-span-2 flex flex-col justify-end">
                   <button
-                    onClick={handleSilangkanF2}
+                    onClick={handleSimulateNext}
                     className="w-full h-[60px] md:h-full lg:min-h-[104px] bg-slate-700 hover:bg-slate-800 text-white font-bold rounded-xl shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-1.5 md:gap-2 text-xs md:text-sm xl:text-base backdrop-blur-sm"
                   >
-                    <GitBranch size={16} /> SIMULASI F2
+                    <GitBranch size={16} /> SIMULASI
                   </button>
                 </div>
               </div>
@@ -1201,9 +1407,12 @@ export default function App() {
           </div>
         )}
 
-        <div ref={f2Ref}>
-          {renderPunnettBoard(f2Data, "Generasi Kedua (F2)")}
-        </div>
+        {crosses.length >= 6 && (
+          <div className="bg-slate-800 text-white p-4 rounded-xl text-center text-sm font-semibold mt-4 shadow-lg flex items-center justify-center gap-2">
+            <Info size={16} /> Batas simulasi silsilah maksimum (F6) telah
+            tercapai.
+          </div>
+        )}
       </div>
     </div>
   );
