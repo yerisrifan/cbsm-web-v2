@@ -13,6 +13,35 @@ import {
   Info,
 } from "lucide-react";
 
+// --- Visual Components (top-level: hindari re-create tiap render) ---
+const ColorSwatch = ({ color1, color2, isLethal }) => (
+  <div className="relative">
+    <div
+      className={`w-10 h-10 md:w-12 md:h-12 rounded-full border-2 border-slate-200 shadow-sm ${isLethal ? "opacity-30" : ""}`}
+      style={{
+        background: `linear-gradient(135deg, ${color1} 40%, ${color2} 60%)`,
+      }}
+    ></div>
+    {isLethal && (
+      <EggOff size={20} className="absolute inset-0 m-auto text-slate-500" />
+    )}
+  </div>
+);
+
+const MiniColorSwatch = ({ color1, color2, isLethal }) => (
+  <div className="relative flex-shrink-0">
+    <div
+      className={`w-8 h-8 rounded-full border border-slate-300 shadow-sm ${isLethal ? "opacity-30" : ""}`}
+      style={{
+        background: `linear-gradient(135deg, ${color1} 40%, ${color2} 60%)`,
+      }}
+    ></div>
+    {isLethal && (
+      <EggOff size={14} className="absolute inset-0 m-auto text-slate-500" />
+    )}
+  </div>
+);
+
 export default function App() {
   const [crossMode, setCrossMode] = useState("mendel1_base");
 
@@ -658,6 +687,7 @@ export default function App() {
     return options;
   };
 
+  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     if (crosses.length === 0) return;
     const sOpts = getAvailableGenotypes(nextSireSource, true);
@@ -668,6 +698,7 @@ export default function App() {
     if (dOpts.length > 0 && !dOpts.find((o) => o.val === nextDamGenotype))
       setNextDamGenotype(dOpts[0].val);
   }, [nextSireSource, nextDamSource, crosses, crossMode]);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   const handleSimulateFirst = () => {
     const initialCross = {
@@ -755,35 +786,6 @@ export default function App() {
     if (src.startsWith("OC_")) return `Outcross Baru`;
     return src;
   };
-
-  // --- Visual Components ---
-  const ColorSwatch = ({ color1, color2, isLethal }) => (
-    <div className="relative">
-      <div
-        className={`w-10 h-10 md:w-12 md:h-12 rounded-full border-2 border-slate-200 shadow-sm ${isLethal ? "opacity-30" : ""}`}
-        style={{
-          background: `linear-gradient(135deg, ${color1} 40%, ${color2} 60%)`,
-        }}
-      ></div>
-      {isLethal && (
-        <EggOff size={20} className="absolute inset-0 m-auto text-slate-500" />
-      )}
-    </div>
-  );
-
-  const MiniColorSwatch = ({ color1, color2, isLethal }) => (
-    <div className="relative flex-shrink-0">
-      <div
-        className={`w-8 h-8 rounded-full border border-slate-300 shadow-sm ${isLethal ? "opacity-30" : ""}`}
-        style={{
-          background: `linear-gradient(135deg, ${color1} 40%, ${color2} 60%)`,
-        }}
-      ></div>
-      {isLethal && (
-        <EggOff size={14} className="absolute inset-0 m-auto text-slate-500" />
-      )}
-    </div>
-  );
 
   const renderPunnettBoard = (crossObj, idx) => {
     if (!crossObj || !crossObj.data) return null;
